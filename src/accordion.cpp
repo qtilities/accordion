@@ -1,8 +1,27 @@
 /*
-    Copyright (c) 2021 Andrea Zanellato
-    SPDX-License-Identifier: MIT
+    MIT License
+
+    Copyright (c) 2021-2023 Andrea Zanellato <redtid3@gmail.com>
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to
+    deal in the Software without restriction, including without limitation the
+    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+    IN THE SOFTWARE.
 */
-#include "collapsiblepane.hpp"
+#include "accordion.hpp"
 
 #include <QPainter>
 #include <QStyleOption>
@@ -10,21 +29,24 @@
 
 #include <QToolButton>
 
-class ArrowButton : public QToolButton {
+namespace Qtilities {
+
+class ArrowButton : public QToolButton
+{
     Q_OBJECT
 
 public:
-    explicit ArrowButton(QWidget* parent = nullptr);
+    explicit ArrowButton(QWidget *parent = nullptr);
 
 private:
-    void paintEvent(QPaintEvent*) override;
+    void paintEvent(QPaintEvent *) override;
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 };
 
-#include "collapsiblepane.moc"
+#include "accordion.moc"
 
-ArrowButton::ArrowButton(QWidget* parent)
+ArrowButton::ArrowButton(QWidget *parent)
     : QToolButton(parent)
 {
     /*
@@ -38,7 +60,7 @@ ArrowButton::ArrowButton(QWidget* parent)
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
-void ArrowButton::paintEvent(QPaintEvent* event)
+void ArrowButton::paintEvent(QPaintEvent *event)
 {
     QToolButton::paintEvent(event);
 
@@ -91,8 +113,9 @@ QSize ArrowButton::sizeHint() const
 {
     return minimumSizeHint();
 }
+} // namespace Qtilities
 
-CollapsiblePane::CollapsiblePane(QWidget* parent)
+Qtilities::Accordion::Accordion(QWidget *parent)
     : QWidget(parent)
     , layout_(new QVBoxLayout(this))
     , button_(new ArrowButton(this))
@@ -104,27 +127,24 @@ CollapsiblePane::CollapsiblePane(QWidget* parent)
     setLayout(layout_);
 }
 
-void CollapsiblePane::setText(const QString& text)
-{
-    button_->setText(text);
-}
+void Qtilities::Accordion::setText(const QString &text) { button_->setText(text); }
 
-void CollapsiblePane::setWidget(QWidget* widget)
+void Qtilities::Accordion::setWidget(QWidget *widget)
 {
     if (widget_) {
-        disconnect(button_, &QAbstractButton::toggled, this, &CollapsiblePane::onExpandWidget);
+        disconnect(button_, &QAbstractButton::toggled, this, &Accordion::onExpandWidget);
         layout_->removeWidget(widget_);
         widget_->deleteLater();
     }
     if (widget) {
         layout_->addWidget(widget);
         widget->hide();
-        connect(button_, &QAbstractButton::toggled, this, &CollapsiblePane::onExpandWidget);
+        connect(button_, &QAbstractButton::toggled, this, &Accordion::onExpandWidget);
     }
     widget_ = widget;
 }
 
-void CollapsiblePane::onExpandWidget(bool visible)
+void Qtilities::Accordion::onExpandWidget(bool visible)
 {
     widget_->setVisible(visible);
 }
